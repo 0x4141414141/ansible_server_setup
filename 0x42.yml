@@ -1,0 +1,33 @@
+---
+- hosts: all 
+  sudo: yes
+
+  tasks:
+
+  - name: install packages
+    apt: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - git
+      - zsh
+      - vim
+      - tree
+      - tmux
+# Example read-write git checkout from github
+  - git:
+      repo: 'https://github.com/0x4141414141/dotfiles.git' 
+      dest: /home/user/dotfiles/
+      clone: yes
+
+  - file:
+      path: /home/user/dotfiles
+      owner: user
+      group: user
+      mode: 0744
+      recurse: yes
+
+  - name: Execute dotfiles provisioning script
+    expect: 
+      command: /home/user/dotfiles/makesymlinks.sh 
+    become: yes
+    become_method: sh
+    become_user: user  
